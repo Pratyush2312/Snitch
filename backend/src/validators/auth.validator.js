@@ -15,12 +15,12 @@ export const registerValidator = [
         .trim()
         .isLength({ min: 6 }).withMessage("Password must be atleast 6 characters long"),
 
-    (req, res, next) => { 
+    (req, res, next) => {
         const errors = validationResult(req);
-        if (!errors.isEmpty()) { 
+        if (!errors.isEmpty()) {
             return res.json({
                 message: "Invalid request",
-                errors:errors.array() 
+                errors: errors.array()
             })
         }
 
@@ -28,3 +28,26 @@ export const registerValidator = [
     }
 ]
 
+
+export const loginValidator = [
+    body('email')
+        .exists().withMessage("Email is required").bail()
+        .isEmail().withMessage("Enter valid email address"),
+    body('password')
+        .exists().withMessage("Password is required").bail()
+        .isString().withMessage("Password must be a string").bail()
+        .trim()
+        .isLength({ min: 6 }).withMessage("Password must be of atleast 6 characteres"),
+
+    (req, res, next) => {
+        const errors = validationResult(req);
+        if (!errors.isEmpty()) {
+            return res.json({
+                message: "Invalid Request",
+                errors: errors.array()
+            })
+        }
+        next();
+    }
+
+]

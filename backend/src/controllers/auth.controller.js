@@ -61,8 +61,9 @@ export const handleLogin = async (req, res) => {
         httpOnly: true
     });
 
-    user.refreshToken = await bcrypt.hash(refreshToken, 10);
-    await user.save();
+    await User.findByIdAndUpdate(user._id, {
+        refreshToken
+    })
 
     return res.status(201).json({
         message: "User Logged in",
@@ -75,3 +76,5 @@ export const handleLogin = async (req, res) => {
 export const hydrateUser = async (req, res) => {
     console.log(req.user);
 }
+
+
