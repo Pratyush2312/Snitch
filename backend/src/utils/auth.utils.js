@@ -3,20 +3,24 @@ import { config } from './../config/config.js';
 
 
 
-export const createAccessToken = ({ userid, role }) => {
+export const createAccessToken = ({ userId, role }) => {
     const accessToken = jwt.sign(
-        { userid, role },
+        { userId, role },
         config.ACCESS_TOKEN_SECRET,
         { expiresIn: '15Min' }
     )
     return accessToken;
 }
 
-export const createRefreshToken = ({ userid, role }) => {
+export const createRefreshToken = ({ userId, role }) => {
     const refreshToken = jwt.sign(
-        { userid, role },
+        { userId, role },
         config.REFRESH_TOKEN_SECRET,
         { expiresIn: '7Days' }
     )
     return refreshToken;
+}
+
+export const verifyRefreshToken = (refreshToken) => {
+    return jwt.verify(refreshToken, config.REFRESH_TOKEN_SECRET);
 }

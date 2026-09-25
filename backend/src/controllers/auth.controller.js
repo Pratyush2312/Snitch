@@ -1,6 +1,6 @@
 import bcrypt from 'bcryptjs';
 import User from './../models/user.model.js';
-import { createAccessToken, createRefreshToken } from './../utils/auth.utils.js';
+import { createAccessToken, createRefreshToken, verifyRefreshToken } from './../utils/auth.utils.js';
 
 export const handleRegister = async (req, res) => {
     const { name, email, password, confirmPassword } = req.body;
@@ -48,12 +48,12 @@ export const handleLogin = async (req, res) => {
     }
 
     const accessToken = createAccessToken({
-        userid: user._id,
+        userId: user._id,
         role: user.role
     })
 
     const refreshToken = createRefreshToken({
-        userid: user._id,
+        userId: user._id,
         role: user.role
     })
 
@@ -62,7 +62,7 @@ export const handleLogin = async (req, res) => {
     });
 
     await User.findByIdAndUpdate(user._id, {
-        refreshToken
+        refreshToken: await bcrypt.hash(refreshToken, 10)
     })
 
     return res.status(201).json({
@@ -74,7 +74,96 @@ export const handleLogin = async (req, res) => {
 }
 
 export const hydrateUser = async (req, res) => {
-    console.log(req.user);
+    const { userId, role } = req.user;
+    const user = await User.findById(userId);
+    return res.status(200).json({
+        message: "User data fetched successfully",
+        data: {
+            user: {
+                email: user.email,
+                name: user.name,
+                id: user._id
+            }
+        }
+    })
 }
 
 
+export const refresh = async (req, res) => {
+    const refreshToken = req.cookies.refreshToken;
+
+    if (!refreshToken) {
+        return res.status(401).json({
+            message: "Refresh token is required."
+        })
+    }
+    try {
+        const decoded = verifyRefreshToken(refreshToken);
+        const { userId, role } = decoded;
+        const user = await User.findById(userId);
+
+        const isValidRefreshToken = await bcrypt.compare(refreshToken, user.refreshToken);
+        if (!isValidRefreshToken) {
+            await User.findByIdAndUpdate(user._id, {
+                refreshToken: null
+            })
+            return res.status(401).status({
+                message: "Refresh token mismatch"
+            })
+        }
+
+        const accessToken = createAccessToken({
+            userId,
+            role
+        });
+        const newRefreshToken = createRefreshToken({
+            userId,
+            role
+        })
+
+        await User.findByIdAndUpdate(user._id, {
+            refreshToken: newRefreshToken
+        })
+
+        res.cookie("refreshToken", newRefreshToken);
+
+        return res.status(200).json({
+            message: "Tokens rotated successfully",
+            data: {
+                accessToken
+            }
+        })
+
+    } catch (error) {
+        console.log(error);
+        return res.status(500).json({
+            message: "Internal server error",
+            error
+        })
+    }
+}
+
+
+export const handleLogout = async (req, res) => {
+    const refreshToken = req.cookies.refreshToken;
+
+    if (!refreshToken) {
+        return res.status(401).json({
+            message: "Refresh token is required."
+        })
+    }
+
+    try {
+        const { userId } = refreshToken;
+        const user = User.findById(userId);
+        await User.findByIdAndUpdate(user._id, {
+            refreshToken: null
+        });
+        res.clearCookie("refreshToken");
+        return res.status(200).json({
+            message: "User logged out successfully"
+        })
+    } catch (error) {
+
+    }
+}

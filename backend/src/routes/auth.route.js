@@ -1,6 +1,6 @@
 import express from "express";
 import { loginValidator, registerValidator } from '../validators/auth.validator.js'
-import { handleLogin, handleRegister, hydrateUser } from "../controllers/auth.controller.js";
+import { handleLogin, handleRegister, hydrateUser, refresh, handleLogout } from "../controllers/auth.controller.js";
 import { authMiddleware } from "../middleware/auth.middleware.js";
 
 const router = express.Router();
@@ -8,6 +8,6 @@ const router = express.Router();
 router.post('/register', registerValidator, handleRegister);
 router.post('/login', loginValidator, handleLogin);
 router.post('/me', authMiddleware, hydrateUser);
-router.post('/refresh-token',)
-
+router.post('/refresh-token', refresh)
+router.post('/logout', authMiddleware, handleLogout)
 export default router;
