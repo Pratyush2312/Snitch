@@ -89,3 +89,29 @@ export const deleteProduct = async (req, res) => {
         message:"Product deleted successfully"
     })
 }
+
+
+
+export const getProductsById = async(req, res)=> { 
+    const { id } = req.params;
+    if (!id) { 
+        return res.status(400).json({
+            messgae:"Invalid ID"
+        })
+    };
+
+    const product = await Product.findById(id);
+
+    if(!product){
+        return res.status(400).json({
+            message:"No Product found"
+        })
+    }
+
+    return res.status(200).json({
+        message: "Product Found",
+        data: {
+            product
+        }
+    })
+}

@@ -1,6 +1,6 @@
 import express from 'express';
 import { authMiddleware } from './../middleware/auth.middleware.js';
-import { createProduct, deleteProduct, listAllProducts, updateProduct } from '../controllers/product.controller.js';
+import { createProduct, deleteProduct, getProductsById, listAllProducts, updateProduct } from '../controllers/product.controller.js';
 import multer from 'multer';
 import { createProductValidator, updateProductValidator } from '../validators/product.validator.js';
 import { authenticateSeller, authorizeSeller } from '../middleware/authSeller.middleware.js';
@@ -22,6 +22,7 @@ router.post('/products', authMiddleware, authenticateSeller, upload.array("image
 
 
 router.get('/products', listAllProducts);
+router.get('/products/:id', getProductsById);
 router.put('/products/:id', authMiddleware, authorizeSeller, upload.array("images"), updateProductValidator,
     (req, res, next) => {
         req.body.price = JSON.parse(req.body.price);

@@ -3,7 +3,7 @@ import User from './../models/user.model.js';
 import { createAccessToken, createRefreshToken, verifyRefreshToken } from './../utils/auth.utils.js';
 
 export const handleRegister = async (req, res) => {
-    const { name, email, password, confirmPassword } = req.body;
+    const { name, email, password, confirmPassword, role } = req.body;
 
     const existingUser = await User.findOne({ email });
     if (existingUser) {
@@ -17,7 +17,8 @@ export const handleRegister = async (req, res) => {
     const newUser = await User.create({
         email,
         name,
-        passwordHash: hashPassword
+        passwordHash: hashPassword,
+        role
     })
 
     const { passwordHash, ...user } = newUser.toObject();
@@ -82,7 +83,8 @@ export const hydrateUser = async (req, res) => {
             user: {
                 email: user.email,
                 name: user.name,
-                id: user._id
+                id: user._id,
+                role:user.role
             }
         }
     })
