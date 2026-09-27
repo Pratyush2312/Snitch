@@ -102,7 +102,7 @@ export const refresh = async (req, res) => {
         const { userId, role } = decoded;
         const user = await User.findById(userId);
 
-        const isValidRefreshToken = await bcrypt.compare(refreshToken, user.refreshToken);
+        const isValidRefreshToken =  bcrypt.compare(refreshToken, user.refreshToken);
         if (!isValidRefreshToken) {
             await User.findByIdAndUpdate(user._id, {
                 refreshToken: null
@@ -164,6 +164,9 @@ export const handleLogout = async (req, res) => {
             message: "User logged out successfully"
         })
     } catch (error) {
-
+        return res.status(500).json({
+            message: "Internal server error",
+            error
+        })
     }
 }

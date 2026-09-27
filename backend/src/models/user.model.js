@@ -23,7 +23,7 @@ const userSchema = new mongoose.Schema({
         type: String
     }
 
-});
+}); 
 
 const User=mongoose.model('Users', userSchema);
 export default User;
