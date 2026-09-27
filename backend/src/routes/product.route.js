@@ -1,8 +1,9 @@
 import express from 'express';
 import { authMiddleware } from './../middleware/auth.middleware.js';
-import { createProduct, listAllProducts } from '../controllers/product.controller.js';
+import { createProduct, deleteProduct, listAllProducts, updateProduct } from '../controllers/product.controller.js';
 import multer from 'multer';
-import { createProductValidator } from '../validators/product.validator.js';
+import { createProductValidator, updateProductValidator } from '../validators/product.validator.js';
+import { authenticateSeller, authorizeSeller } from '../middleware/authSeller.middleware.js';
 const router = express.Router();
 
 const upload = multer({
@@ -13,14 +14,7 @@ const upload = multer({
     }
 })
 
-router.post('/products', authMiddleware, (req, res, next) => {
-    if (req.user.role !== "seller") {
-        return res.status(403).json({
-            message: "User is not authorized to create product"
-        })
-    }
-    next();
-}, upload.array("images"), (req, res, next) => {
+router.post('/products', authMiddleware, authenticateSeller, upload.array("images"), (req, res, next) => {
     req.body.price = JSON.parse(req.body.price);
     req.body.sizes = JSON.parse(req.body.sizes);
     next();
@@ -28,5 +22,13 @@ router.post('/products', authMiddleware, (req, res, next) => {
 
 
 router.get('/products', listAllProducts);
+router.put('/products/:id', authMiddleware, authorizeSeller, upload.array("images"), updateProductValidator,
+    (req, res, next) => {
+        req.body.price = JSON.parse(req.body.price);
+        req.body.sizes = JSON.parse(req.body.sizes);
+        next();
+    },
+    createProductValidator, updateProduct)
+router.delete('/products/:id', authMiddleware, authorizeSeller, updateProductValidator, deleteProduct)
 
 export default router;

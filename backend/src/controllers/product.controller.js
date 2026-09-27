@@ -3,7 +3,6 @@ import Product from './../models/product.model.js';
 
 export const createProduct = async (req, res) => {
     const { title, description, price, sizes } = req.body;
-
     const fileUrls = [];
     for (let i = 0; i < req.files.length; i++) {
         const response = await uploadFile({
@@ -43,5 +42,50 @@ export const listAllProducts = async (req, res) => {
         data: {
             products
         }
+    })
+}
+
+export const updateProduct = async (req, res) => {
+    const { id } = req.params;
+    const { title, description, price, sizes } = req.body;
+    const product = await Product.findById(id);
+    if (!product) {
+        return res.status(404).json({
+            message: "Product not found"
+        })
+    }
+
+    const updatedProduct = await Product.findByIdAndUpdate(id, {
+        title,
+        description,
+        price: {
+            amount: price.amount,
+            currency: price.currency
+        },
+        sizes
+    })
+
+    return res.status(200).json({
+        message: "Product updated successfully",
+        data: {
+            updatedProduct
+        }
+    })
+}
+
+export const deleteProduct = async (req, res) => {
+    const { id } = req.params;
+
+    const product = await Product.findById(id);
+    if (!product) {
+        return res.status(404).json({
+            message: "Product not found"
+        })
+    }
+
+    await Product.findByIdAndDelete(id);
+
+    return res.status(200).json({
+        message:"Product deleted successfully"
     })
 }
