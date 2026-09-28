@@ -6,7 +6,7 @@ export const MyStore = createContext();
 
 export const MyStoreProvider = ({ children }) => {
   const [user, setUser] = useState(null);
-
+  console.log(import.meta.env.VITE_API_URL)
   useEffect(() => {
     const getMe = async () => {
       try {
