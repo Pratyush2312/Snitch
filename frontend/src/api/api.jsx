@@ -15,4 +15,14 @@ api.interceptors.request.use((config) => {
   return config;
 });
 
+api.interceptors.response.use((response) => response,
+  async (error) => { 
+    if (error.response.status === 401) { 
+      const res = await api.post("/auth/refresh-token");
+      localStorage.setItem("accessToken", res.data.data.accessToken);
+    }
+    return Promise.reject(error);
+  }
+);
+
 export default api;

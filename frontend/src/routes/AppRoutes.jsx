@@ -9,6 +9,7 @@ import SellerDashboard from "../features/seller/ui/SellerDashboard";
 import ProductForm from "../features/seller/ui/ProductForm";
 import ProtectedRoute from "./ProtectedRoute";
 import SellerRoute from "./SellerRoute";
+import EditProduct from "../features/seller/ui/EditProduct";
 
 const router = createBrowserRouter([
   { path: "/", element: <Landing /> },
@@ -25,7 +26,7 @@ const router = createBrowserRouter([
     children: [
       { path: "/seller", element: <SellerDashboard /> },
       { path: "/seller/products/new", element: <ProductForm /> },
-      { path: "/seller/products/:id/edit", element: <ProductForm /> },
+      { path: "/seller/products/:id/edit", element: <EditProduct /> },
     ],
   },
   { path: "*", element: <Navigate to="/" replace /> },

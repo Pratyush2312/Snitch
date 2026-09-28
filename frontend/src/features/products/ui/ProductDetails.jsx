@@ -2,13 +2,14 @@ import { Link, useParams } from "react-router";
 import Navbar from "../../../shared/Navbar";
 import { useEffect, useState } from "react";
 import api from "../../../api/api";
+import useProductHook from "../hooks/useProductHook";
 
 function ProductDetails() {
   const [product, setProduct] = useState({});
   const [selectedSize, setSelectedSize] = useState("");
   const [quantity, setQuantity] = useState(1);
   const { id } = useParams();
-
+  const { addToCart } = useProductHook();
   useEffect(() => {
     const getProductDetails = async () => {
       try {
@@ -126,6 +127,7 @@ function ProductDetails() {
             </div>
 
             <button
+              onClick={()=>addToCart(id,quantity,selectedSize)}
               type="button"
               className="w-full py-4 rounded-xl bg-[#171513] text-white font-semibold hover:bg-[#302c28] transition">
               Add to Cart

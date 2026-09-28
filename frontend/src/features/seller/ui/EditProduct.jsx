@@ -1,13 +1,49 @@
-import { Link } from "react-router";
-
+import { useEffect } from "react";
+import { Link, useParams } from "react-router";
 import Navbar from "../../../shared/Navbar";
 import useSellerHook from "../hooks/useSellerHook";
+import api from "../../../api/api";
 
 const productSizes = ["XS", "S", "M", "L", "XL"];
 
-function ProductForm() {
-  const { register, handleSubmit, errors, isSubmitting, handleCreateProduct } =
-    useSellerHook();
+function EditProduct() {
+  const { id } = useParams();
+
+  const {
+    register,
+    handleSubmit,
+    reset,
+    errors,
+    isSubmitting,
+    handleUpdateProduct,
+  } = useSellerHook();
+
+  useEffect(() => {
+    const getProduct = async () => {
+      try {
+        const res = await api.get(`/products/${id}`);
+
+        const product = res.data.data.product;
+
+        reset({
+          title: product.title,
+          description: product.description,
+          price: {
+            amount: product.price?.amount,
+            currency: product.price?.currency || "INR",
+          },
+          sizes: product.sizes?.map((item) => ({
+            size: item.size,
+            stock: item.stock,
+          })),
+        });
+      } catch (error) {
+        console.log(error);
+      }
+    };
+
+    getProduct();
+  }, [id, reset]);
 
   return (
     <div className="min-h-screen bg-[#f7f5f2] text-[#171513]">
@@ -26,29 +62,31 @@ function ProductForm() {
               Seller tools
             </p>
 
-            <h1 className="text-3xl md:text-4xl font-bold mt-2">Add Product</h1>
+            <h1 className="text-3xl md:text-4xl font-bold mt-2">
+              Edit Product
+            </h1>
+
+            <p className="text-gray-500 mt-3">
+              Update your product information and stock.
+            </p>
           </div>
 
           <form
-            onSubmit={handleSubmit(handleCreateProduct)}
+            onSubmit={handleSubmit((data) => handleUpdateProduct(data, id))}
             className="flex flex-col gap-6 mt-8">
             {/* Title */}
             <div className="flex flex-col gap-2">
               <label className="font-semibold">Title</label>
 
               <input
-                id="title"
                 type="text"
                 className="border rounded-xl px-4 py-3 outline-none focus:border-black"
                 placeholder="Product title"
                 {...register("title", {
                   required: "Title is required",
-                  minLength: {
-                    value: 2,
-                    message: "Title must be at least 2 characters",
-                  },
                 })}
               />
+
               {errors.title && (
                 <p className="text-sm text-red-600">{errors.title.message}</p>
               )}
@@ -59,18 +97,14 @@ function ProductForm() {
               <label className="font-semibold">Description</label>
 
               <textarea
-                id="description"
                 rows="5"
                 className="border rounded-xl px-4 py-3 outline-none focus:border-black resize-none"
                 placeholder="Describe your product"
                 {...register("description", {
                   required: "Description is required",
-                  minLength: {
-                    value: 10,
-                    message: "Description must be at least 10 characters",
-                  },
                 })}
               />
+
               {errors.description && (
                 <p className="text-sm text-red-600">
                   {errors.description.message}
@@ -84,21 +118,16 @@ function ProductForm() {
                 <label className="font-semibold">Price</label>
 
                 <input
-                  id="price"
                   type="number"
                   min="0.01"
                   step="0.01"
                   className="border rounded-xl px-4 py-3 outline-none focus:border-black"
-                  placeholder="Enter price"
                   {...register("price.amount", {
                     required: "Price is required",
                     valueAsNumber: true,
-                    min: {
-                      value: 0.01,
-                      message: "Price must be greater than 0",
-                    },
                   })}
                 />
+
                 {errors.price?.amount && (
                   <p className="text-sm text-red-600">
                     {errors.price.amount.message}
@@ -110,19 +139,11 @@ function ProductForm() {
                 <label className="font-semibold">Currency</label>
 
                 <select
-                  id="currency"
                   className="border rounded-xl px-4 py-3 outline-none focus:border-black"
-                  {...register("price.currency", {
-                    required: "Currency is required",
-                  })}>
+                  {...register("price.currency")}>
                   <option value="INR">INR</option>
                   <option value="USD">USD</option>
                 </select>
-                {errors.price?.currency && (
-                  <p className="text-sm text-red-600">
-                    {errors.price.currency.message}
-                  </p>
-                )}
               </div>
             </div>
 
@@ -135,22 +156,18 @@ function ProductForm() {
                   <div key={size} className="border rounded-xl p-3">
                     <p className="font-bold">{size}</p>
 
+                    <input type="hidden" {...register(`sizes.${index}.size`)} />
+
                     <input
-                      type="hidden"
-                      {...register(`sizes.${index}.size`, { value: size })}
-                    />
-                    <input
-                      id={`stock-${size}`}
                       type="number"
                       min="0"
                       className="w-full border rounded-lg px-3 py-2 mt-2"
                       placeholder="Stock"
                       {...register(`sizes.${index}.stock`, {
-                        required: `Stock for size ${size} is required`,
                         valueAsNumber: true,
-                        min: { value: 0, message: "Stock cannot be negative" },
                       })}
                     />
+
                     {errors.sizes?.[index]?.stock && (
                       <p className="text-sm text-red-600 mt-1">
                         {errors.sizes[index].stock.message}
@@ -163,40 +180,26 @@ function ProductForm() {
 
             {/* Images */}
             <div className="flex flex-col gap-2">
-              <label className="font-semibold">Product images</label>
+              <label className="font-semibold">Replace Product Images</label>
 
               <input
-                id="images"
                 type="file"
                 accept="image/*"
                 multiple
                 className="border rounded-xl p-3"
-                {...register("images", {
-                  validate: {
-                    maxFiles: (files) =>
-                      files.length <= 5 || "Choose no more than 5 images",
-                    maxSize: (files) =>
-                      Array.from(files).every(
-                        (file) => file.size <= 1024 * 1024,
-                      ) || "Each image must be 1 MB or smaller",
-                  },
-                })}
+                {...register("images")}
               />
-              {errors.images && (
-                <p className="text-sm text-red-600">{errors.images.message}</p>
-              )}
 
               <p className="text-xs text-gray-500">
-                Up to 5 images, 1 MB each.
+                Leave empty to keep the existing images.
               </p>
             </div>
 
-            {/* Submit */}
             <button
               type="submit"
               disabled={isSubmitting}
               className="py-3.5 rounded-xl bg-[#171513] text-white font-semibold disabled:opacity-60">
-              {isSubmitting ? "Submitting..." : "Create Product"}
+              {isSubmitting ? "Updating..." : "Update Product"}
             </button>
           </form>
         </div>
@@ -205,4 +208,4 @@ function ProductForm() {
   );
 }
 
-export default ProductForm;
+export default EditProduct;

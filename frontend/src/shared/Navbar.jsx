@@ -21,7 +21,7 @@ function Navbar() {
         <nav className="hidden md:flex items-center gap-7 text-sm font-medium">
           <Link to="/products" className="hover:text-[#d96f2b]">Products</Link>
           {user?.role === "seller" && <Link to="/seller" className="hover:text-[#d96f2b]">Seller Dashboard</Link>}
-          {/* {user && <Link to="/cart" className="hover:text-[#d96f2b]">Cart ({cartCount})</Link>} */}
+          {user && <Link to="/cart" className="hover:text-[#d96f2b]">Cart</Link>}
         </nav>
 
         <div className="flex items-center gap-3">

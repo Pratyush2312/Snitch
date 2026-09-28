@@ -4,14 +4,14 @@ import { useEffect } from "react";
 import useCartHook from "../hooks/useCartHook";
 
 function Cart() {
-  const { getCart, cart } = useCartHook();
-
+  const { getCart, cart, removeFromCart } = useCartHook();
+  console.log(cart)
   useEffect(() => {
     getCart();
   }, []);
 
   const total = cart.reduce(
-    (sum, item) => sum + Number(item.price?.amount || 0) * item.quantity,
+    (sum, item) => sum + Number(item.product.price?.amount || 0) * item.quantity,
     0,
   );
 
@@ -60,7 +60,7 @@ function Cart() {
                   key={item.key}
                   className="bg-white border border-[#e4dfd8] rounded-2xl p-4 flex gap-5">
                   <img
-                    src={item.image}
+                    src={item?.product.images[0]}
                     alt={item.title}
                     className="w-28 h-28 rounded-xl object-cover bg-[#eeeae5] shrink-0"
                   />
@@ -68,7 +68,7 @@ function Cart() {
                   <div className="flex-1 min-w-0 flex flex-col justify-between gap-3">
                     <div className="flex justify-between gap-4">
                       <div>
-                        <h2 className="font-bold">{item.title}</h2>
+                        <h2 className="font-bold">{item.product.title}</h2>
 
                         <p className="text-sm text-gray-500 mt-1">
                           Size: {item.size}
@@ -76,24 +76,20 @@ function Cart() {
                       </div>
 
                       <p className="font-bold">
-                        {item.price?.currency} {item.price?.amount}
+                        {item.product.price?.currency}{" "}
+                        {item.product.price?.amount}
                       </p>
                     </div>
 
-                    <div className="flex items-center justify-between gap-3">
-                      <div className="flex items-center border rounded-lg overflow-hidden">
-                        <button type="button" className="px-3 py-1.5">
-                          −
-                        </button>
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center">
+                        <p>Quantity:</p>
 
                         <span className="px-3">{item.quantity}</span>
-
-                        <button type="button" className="px-3 py-1.5">
-                          +
-                        </button>
                       </div>
 
                       <button
+                      onClick={()=>removeFromCart(item.product._id,item.size)}
                         type="button"
                         className="text-sm text-red-600 font-semibold">
                         Remove
