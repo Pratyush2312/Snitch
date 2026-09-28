@@ -67,7 +67,7 @@ function Landing() {
                 <div className="absolute -bottom-8 -left-8 w-40 h-40 bg-[#d8c5ad] rounded-full blur-3xl opacity-50" />
 
                 <div className="relative grid grid-cols-2 gap-4">
-                  <div className="mt-12 overflow-hidden rounded-[2rem] bg-[#ded8d0] aspect-[4/5]">
+                  <div className="mt-12 overflow-hidden rounded-4xl bg-[#ded8d0] aspect-4/5">
                     <img
                       src="https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?auto=format&fit=crop&w=900&q=80"
                       alt="Fashion product"
@@ -75,7 +75,7 @@ function Landing() {
                     />
                   </div>
 
-                  <div className="overflow-hidden rounded-[2rem] bg-[#d9d0c5] aspect-[4/5]">
+                  <div className="overflow-hidden rounded-4xl bg-[#d9d0c5] aspect-4/5">
                     <img
                       src="https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&w=900&q=80"
                       alt="Sneakers"
@@ -169,12 +169,10 @@ function Landing() {
       <footer className="border-t border-gray-200">
         <div className="max-w-7xl mx-auto px-6 lg:px-12 py-8 flex flex-col md:flex-row justify-between items-center gap-4">
           <span className="font-bold text-xl">
-            Mini<span className="text-[#d96f2b]">Store</span>
+            Snitch
           </span>
 
-          <p className="text-sm text-gray-500">
-            © 2026 MiniStore. Built with React.
-          </p>
+          
 
           <div className="flex gap-5 text-sm">
             <Link to="/products" className="hover:text-[#d96f2b]">

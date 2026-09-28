@@ -15,7 +15,7 @@ function Navbar() {
     <header className="sticky top-0 z-40 border-b border-[#e4dfd8] bg-white/95 backdrop-blur">
       <div className="max-w-7xl mx-auto px-6 lg:px-12 h-18 flex items-center justify-between gap-5">
         <Link to="/" className="text-2xl font-black tracking-tight">
-          Mini<span className="text-[#d96f2b]">Store</span>
+          Snitch
         </Link>
 
         <nav className="hidden md:flex items-center gap-7 text-sm font-medium">

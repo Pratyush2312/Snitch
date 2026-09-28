@@ -1,12 +1,13 @@
-import { useState } from "react";
+import { useContext, useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "react-hot-toast";
 import { useNavigate } from "react-router";
 import api from "../../../api/api";
+import { MyStore } from "../../../context/MyStore";
 
 const useAuthHook = () => {
   const navigate = useNavigate();
-
+  const { setUser } = useContext(MyStore);
   const {
     register,
     handleSubmit,
@@ -19,9 +20,7 @@ const useAuthHook = () => {
 
   const handleRegister = async (data) => {
     try {
-      console.log(data)
       const res = await api.post("/auth/register", data);
-
       toast.success(res.data.message || "Account created successfully");
 
       navigate("/login");
@@ -41,8 +40,11 @@ const useAuthHook = () => {
       const res = await api.post("/auth/login", data);
       localStorage.setItem("accessToken", res.data.data.accessToken);
       toast.success(res.data.message);
+      setUser(res.data.data.user);
       navigate("/products");
-    } catch (error) {}
+    } catch (error) {
+      toast.error(error.response.data.message);
+    }
   };
 
   const logout = async () => {
@@ -53,7 +55,7 @@ const useAuthHook = () => {
     } finally {
       localStorage.removeItem("accessToken");
 
-      window.dispatchEvent(new Event("auth-change"));
+      setUser(null);
 
       navigate("/");
       toast.success("Logged out successfully");

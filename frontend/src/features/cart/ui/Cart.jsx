@@ -5,7 +5,6 @@ import useCartHook from "../hooks/useCartHook";
 
 function Cart() {
   const { getCart, cart, removeFromCart } = useCartHook();
-  console.log(cart)
   useEffect(() => {
     getCart();
   }, []);
