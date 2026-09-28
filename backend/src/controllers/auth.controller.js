@@ -69,7 +69,8 @@ export const handleLogin = async (req, res) => {
     return res.status(201).json({
         message: "User Logged in",
         data: {
-            accessToken
+            accessToken,
+            user
         }
     })
 }
