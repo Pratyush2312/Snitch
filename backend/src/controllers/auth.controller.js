@@ -59,7 +59,9 @@ export const handleLogin = async (req, res) => {
     })
 
     res.cookie("refreshToken", refreshToken, {
-        httpOnly: true
+        httpOnly: true,
+        secure: true,
+        sameSite:none
     });
 
     await User.findByIdAndUpdate(user._id, {
