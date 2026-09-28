@@ -12,10 +12,10 @@ function Register() {
         <div className="flex flex-col gap-7">
           <div className="flex flex-col gap-2 text-center">
             <Link to="/" className="text-2xl font-black tracking-tight">
-              Mini<span className="text-[#d96f2b]">Store</span>
+              Snitch
             </Link>
             <h1 className="text-3xl font-bold mt-4">Create account</h1>
-            <p className="text-gray-500">Join MiniStore and get started.</p>
+            <p className="text-gray-500">Join Snitch and get started.</p>
           </div>
 
           <form
