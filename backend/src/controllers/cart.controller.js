@@ -9,7 +9,7 @@ export const addToCart = async (req, res) => {
 
 
     if (!product) {
-        return res.status(400).json({
+        return res.status(404).json({
             message: "Product not found"
         })
     }
@@ -33,7 +33,6 @@ export const addToCart = async (req, res) => {
     })
 
     const productInCart = cart.products.find(p => (p.product.toString() === productID) && (p.size === size));
-    console.log(productInCart)
     if (productInCart) {
         if ((productInCart.quantity + quantity) > selectedSize.stock) {
             return res.status(400).json({
@@ -62,13 +61,15 @@ export const addToCart = async (req, res) => {
     await Cart.findOneAndUpdate(
         { user: req.user.userId },
         {
-            products: {
-                product: productID,
-                quantity,
-                size
+            $push: {
+                products: {
+                    product: productID,
+                    quantity,
+                    size
+                }
             }
         }
-    )
+    );
 
     return res.status(201).json({
         message: "Product added to Cart"
@@ -78,9 +79,15 @@ export const addToCart = async (req, res) => {
 
 export const getCart = async (req, res) => {
     try {
-        const cart = (await Cart.findOne({ user: req.user.userId })) ?? await Cart.create({
+        let cart = await Cart.findOne({
             user: req.user.userId
-        })
+        }).populate("products.product");
+
+        if (!cart) {
+            cart = await Cart.create({
+                user: req.user.userId
+            });
+        }
         return res.status(200).json({
             message: "Cart retreived successfully",
             data: {
@@ -93,3 +100,50 @@ export const getCart = async (req, res) => {
         })
     }
 }
+
+
+export const removeFromCart = async (req, res) => {
+    console.log(req.body)
+    const { productID, size } = req.body;
+    const cart = await Cart.findOne({
+        user: req.user.userId
+    });
+
+    if (!cart) {
+        return res.status(404).json({
+            message: "Cart not found"
+        });
+    }
+
+    const productInCart = cart.products.find(
+        item =>
+            item.product.toString() === productID &&
+            item.size === size
+    );
+
+    if (!productInCart) {
+        return res.status(404).json({
+            message: "Product not found in cart"
+        });
+    }
+
+    await Cart.findOneAndUpdate(
+        {
+            user: req.user.userId
+        },
+        {
+            $pull: {
+                products: {
+                    product: productID,
+                    size: size
+                }
+            }
+        }
+    );
+
+
+
+    return res.status(200).json({
+        message: "Product removed from cart"
+    });
+};

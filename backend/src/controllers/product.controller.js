@@ -84,9 +84,12 @@ export const deleteProduct = async (req, res) => {
     }
 
     await Product.findByIdAndDelete(id);
-
+    const products = await Product.find();
     return res.status(200).json({
-        message:"Product deleted successfully"
+        message: "Product deleted successfully",
+        data: {
+            products
+        }
     })
 }
 
@@ -112,6 +115,26 @@ export const getProductsById = async(req, res)=> {
         message: "Product Found",
         data: {
             product
+        }
+    })
+}
+
+
+
+export const getProductsBySeller = async (req, res) => { 
+    const { userId } = req.user;
+    console.log(userId);
+    const products = await Product.find({ seller: userId });
+    if (!products) {
+        return res.status(404).json({
+            message:"No products found"
+        })
+    }
+
+    return res.status(200).json({
+        message: "Products retreived successfully",
+        data: {
+            products
         }
     })
 }
