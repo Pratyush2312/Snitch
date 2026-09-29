@@ -8,7 +8,6 @@ const productSizes = ["XS", "S", "M", "L", "XL"];
 
 function EditProduct() {
   const { id } = useParams();
-
   const {
     register,
     handleSubmit,
@@ -72,7 +71,7 @@ function EditProduct() {
           </div>
 
           <form
-            onSubmit={handleSubmit((data) => handleUpdateProduct(data, id))}
+            onSubmit={handleSubmit((data) => handleUpdateProduct(id,data))}
             className="flex flex-col gap-6 mt-8">
             {/* Title */}
             <div className="flex flex-col gap-2">
