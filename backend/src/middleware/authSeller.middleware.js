@@ -17,7 +17,6 @@ export const authenticateSeller = (req, res, next) => {
 export const authorizeSeller = async (req, res, next) => {
     const { id } = req.params;
     const { userId } = req.user;
-
     const product = await Product.findById(id);
 
     if (!product) {
